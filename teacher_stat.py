@@ -27,7 +27,10 @@ with open(path) as source:
                 if countOfMarks > 0:
                     finalMark = sumOfMarks / countOfMarks
                 if teacher in teachers:
-                    teachers[teacher][subject]["teacher"] = finalMark
+                    if subject in teachers[teacher]:
+                        teachers[teacher][subject]["teacher"] = finalMark
+                    else:
+                        teachers[teacher][subject] = {"teacher":finalMark}
                 else:
                     teachers[teacher] = {subject: {"teacher": finalMark}}
             elif newLine[0] == "Оцените предмет по шкале от 1 до 5:":
@@ -40,12 +43,16 @@ with open(path) as source:
                 if countOfMarks > 0:
                     finalMark = sumOfMarks / countOfMarks
                 if teacher in teachers:
-                    teachers[teacher][subject]["subject"] = finalMark
+                    if subject in teachers[teacher]:
+                        teachers[teacher][subject]["subject"] = finalMark
+                    else:
+                        teachers[teacher][subject] = {"subject":finalMark}
+
                 else:
                     teachers[teacher] = {subject: {"subject": finalMark}}
             else:
                 continue
-
+print(teachers)
 # write results
 with open("result.csv","w") as out:
     out.write("Преподаватель;Предмет;Средняя оценка за предмет;Средняя оценка преподавателя\n")
