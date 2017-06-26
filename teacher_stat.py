@@ -1,5 +1,5 @@
 def read_statics_from_file(path):
-    # make dict
+    # make dictionary
     teachers = {}
     with open(path) as source:
         for line in source:
@@ -65,7 +65,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
