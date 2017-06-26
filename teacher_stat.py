@@ -58,7 +58,6 @@ def write_statistics_to_file(teachers):
 
 
 def main():
-    # set file or path
     local_path = "./source.csv"
     teachers = read_statics_from_file(local_path)
     write_statistics_to_file(teachers)
