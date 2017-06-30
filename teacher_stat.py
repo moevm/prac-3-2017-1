@@ -1,49 +1,58 @@
 def read_statics_from_file(path):
     statistics = []
+    start_string = "Семестр"
+    subject_mark_string = "Оцените предмет по шкале от 1 до 5:"
+    teacher_mark_string = "Оцените качество преподавания курса по шкале от 1 до 5:"
+    semester_key = "semester"
+    course_key = "course"
+    subject_key = "subject"
+    teacher_key = "teacher"
+    teacher_mark_key = "teacher_mark"
+    subject_mark_key = "subject_mark"
     with open(path) as source:
         for line in source:
             line = line.strip().split(";")
-            if line[0] == "Семестр":
+            if line[0] == start_string:
                 new_line = source.readline().strip().split(";")
                 semester = new_line[0]
                 course = new_line[1]
                 new_line = source.readline().strip().split(";")
-                if new_line[0] == "Оцените качество преподавания курса по шкале от 1 до 5:":
+                if new_line[0] == teacher_mark_string:
                     second_line = source.readline()
                     teacher,subject,final_mark = extract_name_and_marks(new_line, second_line)
                     is_find = False
                     for stat in statistics:
-                        if stat["semester"] == semester and \
-                                        stat["course"] == course and \
-                                        stat["subject"] == subject and \
-                                        stat["teacher"] == teacher:
-                            stat["teacher_mark"] = final_mark
+                        if stat[semester_key] == semester and \
+                                        stat[course_key] == course and \
+                                        stat[subject_key] == subject and \
+                                        stat[teacher_key] == teacher:
+                            stat[teacher_mark_key] = final_mark
                             is_find = True
                     if not is_find:
-                        statistics.append({"semester": semester,
-                                           "course": course,
-                                           "teacher": teacher,
-                                           "subject": subject,
-                                           "subject_mark": 0,
-                                           "teacher_mark": final_mark})
-                elif new_line[0] == "Оцените предмет по шкале от 1 до 5:":
+                        statistics.append({semester_key: semester,
+                                           course_key: course,
+                                           teacher_key: teacher,
+                                           subject_key: subject,
+                                           subject_mark_key: 0,
+                                           teacher_mark_key: final_mark})
+                elif new_line[0] == subject_mark_string:
                     second_line = source.readline()
                     teacher,subject,final_mark = extract_name_and_marks(new_line, second_line)
                     is_find = False
                     for stat in statistics:
-                        if stat["semester"] == semester and \
-                                        stat["course"] == course and \
-                                        stat["subject"] == subject and \
-                                        stat["teacher"] == teacher:
-                            stat["subject_mark"] = final_mark
+                        if stat[semester_key] == semester and \
+                                        stat[course_key] == course and \
+                                        stat[subject_key] == subject and \
+                                        stat[teacher_key] == teacher:
+                            stat[subject_mark_key] = final_mark
                             is_find = True
                     if not is_find:
-                        statistics.append({"semester": semester,
-                                           "course": course,
-                                           "teacher": teacher,
-                                           "subject": subject,
-                                           "subject_mark": final_mark,
-                                           "teacher_mark": 0})
+                        statistics.append({semester_key: semester,
+                                           course_key: course,
+                                           teacher_key: teacher,
+                                           subject_key: subject,
+                                           subject_mark_key: final_mark,
+                                           teacher_mark_key: 0})
                 else:
                     continue
     return statistics
@@ -64,14 +73,18 @@ def extract_name_and_marks(new_line, second_line):
 
 
 def write_statistics_to_file(statistics, path="result.csv"):
+    subject_key = "subject"
+    teacher_key = "teacher"
+    teacher_mark_key = "teacher_mark"
+    subject_mark_key = "subject_mark"
+    head = "Преподаватель;Предмет;Средняя оценка за предмет;Средняя оценка преподавателя\n"
     with open(path, "w") as out:
-        head = "Преподаватель;Предмет;Средняя оценка за предмет;Средняя оценка преподавателя\n"
         out.write(head)
         for stat in statistics:
-            out.write(stat["teacher"] + ";"
-                      + stat["subject"] + ";"
-                      + str(stat["subject_mark"]) + ";"
-                      + str(stat["teacher_mark"]) + "\n")
+            out.write(stat[teacher_key] + ";"
+                      + stat[subject_key] + ";"
+                      + str(stat[subject_mark_key]) + ";"
+                      + str(stat[teacher_mark_key]) + "\n")
 
 def main():
     local_path = "./source.csv"
