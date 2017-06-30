@@ -1,6 +1,5 @@
 def read_statics_from_file(path):
-    # make dictionary
-    statistics = {}
+    statistics = []
     with open(path) as source:
         for line in source:
             line = line.strip().split(";")
@@ -12,36 +11,39 @@ def read_statics_from_file(path):
                 if new_line[0] == "Оцените качество преподавания курса по шкале от 1 до 5:":
                     second_line = source.readline()
                     teacher,subject,final_mark = extract_name_and_marks(new_line, second_line)
-                    if semester in statistics:
-                        if course in statistics[semester]:
-                            if teacher in statistics[semester][course]:
-                                if subject in statistics[semester][course][teacher]:
-                                    statistics[semester][course][teacher][subject]["teacher"] = final_mark
-                                else:
-                                    statistics[semester][course][teacher][subject] = {"teacher": final_mark,"subject": 0}
-                            else:
-                                statistics[semester][course][teacher] = {subject: {"teacher": final_mark, "subject": 0}}
-                        else:
-                            statistics[semester][course] = {teacher: {subject: {"teacher": final_mark, "subject": 0}}}
-                    else:
-                        statistics[semester] = {course: {teacher: {subject: {"teacher": final_mark, "subject": 0}}}}
-
+                    is_find = False
+                    for stat in statistics:
+                        if stat["semester"] == semester and \
+                                        stat["course"] == course and \
+                                        stat["subject"] == subject and \
+                                        stat["teacher"] == teacher:
+                            stat["teacher_mark"] = final_mark
+                            is_find = True
+                    if not is_find:
+                        statistics.append({"semester": semester,
+                                           "course": course,
+                                           "teacher": teacher,
+                                           "subject": subject,
+                                           "subject_mark": 0,
+                                           "teacher_mark": final_mark})
                 elif new_line[0] == "Оцените предмет по шкале от 1 до 5:":
                     second_line = source.readline()
                     teacher,subject,final_mark = extract_name_and_marks(new_line, second_line)
-                    if semester in statistics:
-                        if course in statistics[semester]:
-                            if teacher in statistics[semester][course]:
-                                if subject in statistics[semester][course][teacher]:
-                                    statistics[semester][course][teacher][subject]["subject"] = final_mark
-                                else:
-                                    statistics[semester][course][teacher][subject] = {"teacher": 0, "subject": final_mark}
-                            else:
-                                statistics[semester][course][teacher] = {subject: {"teacher": 0, "subject": final_mark}}
-                        else:
-                            statistics[semester][course] = {teacher: {subject: {"teacher": 0, "subject": final_mark}}}
-                    else:
-                        statistics[semester] = {course: {teacher: {subject: {"teacher": 0, "subject": final_mark}}}}
+                    is_find = False
+                    for stat in statistics:
+                        if stat["semester"] == semester and \
+                                        stat["course"] == course and \
+                                        stat["subject"] == subject and \
+                                        stat["teacher"] == teacher:
+                            stat["subject_mark"] = final_mark
+                            is_find = True
+                    if not is_find:
+                        statistics.append({"semester": semester,
+                                           "course": course,
+                                           "teacher": teacher,
+                                           "subject": subject,
+                                           "subject_mark": final_mark,
+                                           "teacher_mark": 0})
                 else:
                     continue
     return statistics
@@ -65,22 +67,19 @@ def write_statistics_to_file(statistics, path="result.csv"):
     with open(path, "w") as out:
         head = "Преподаватель;Предмет;Средняя оценка за предмет;Средняя оценка преподавателя\n"
         out.write(head)
-        for semester in statistics:
-            for course in statistics[semester]:
-                for teacher in statistics[semester][course]:
-                    for sub in statistics[semester][course][teacher]:
-                        out.write(teacher + ";"
-                                  + sub + ";"
-                                  + str(statistics[semester][course][teacher][sub]["subject"]) + ";"
-                                  + str(statistics[semester][course][teacher][sub]["teacher"]) + "\n")
-
-
+        for stat in statistics:
+            out.write(stat["teacher"] + ";"
+                      + stat["subject"] + ";"
+                      + str(stat["subject_mark"]) + ";"
+                      + str(stat["teacher_mark"]) + "\n")
 
 def main():
     local_path = "./source.csv"
     local_path_write = "result.csv"
     statistics = read_statics_from_file(local_path)
     write_statistics_to_file(statistics,local_path_write)
+
+
 
 
 if __name__ == "__main__":
